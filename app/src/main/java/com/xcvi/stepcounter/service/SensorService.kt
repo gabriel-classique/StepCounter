@@ -98,17 +98,17 @@ class SensorService : Service() {
         }
         sensor.startListening()
         sensor.setOnSensorValuesChangeListener { data ->
-
             CoroutineScope(Dispatchers.IO).launch {
                 val savedSteps = repository.getLatestSteps(LocalDate.now().toEpochDay())
-                val delta = savedSteps - data[0].toInt()
                 val newSteps = data[0].roundToInt()
+                val delta = savedSteps - newSteps
                 deltaSteps = if(delta >= 0){
                     delta
                 } else {
                     0
                 }
-                repository.incSteps(deltaSteps + newSteps - savedSteps)
+                steps = deltaSteps + newSteps - savedSteps
+                repository.incSteps(steps)
             }
         }
         isRunning = true
