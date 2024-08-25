@@ -107,8 +107,12 @@ class SensorService : Service() {
                 } else {
                     0
                 }
-                steps = deltaSteps + newSteps - savedSteps
-                repository.incSteps(steps)
+                val stepsToSave = deltaSteps + newSteps - savedSteps
+                if(stepsToSave > 0){
+                    repository.incSteps(deltaSteps + newSteps - savedSteps)
+                } else {
+                    repository.incSteps()
+                }
             }
         }
         isRunning = true
@@ -128,8 +132,6 @@ class SensorService : Service() {
         const val SERVICE_ID = 11111
 
         var isRunning by mutableStateOf(false)
-            private set
-        var steps by mutableIntStateOf(0)
             private set
 
         fun hasPermissions(context: Context): Boolean {
