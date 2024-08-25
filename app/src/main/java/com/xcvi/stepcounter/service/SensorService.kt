@@ -84,7 +84,7 @@ class SensorService : Service() {
             )
             .setContentText(
                 if (isRunning) {
-                    "Steps: $steps"
+                    "You can hide this notification."
                 } else {
                     ""
                 }
