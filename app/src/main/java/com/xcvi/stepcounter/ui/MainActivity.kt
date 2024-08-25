@@ -18,6 +18,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -89,25 +90,17 @@ fun MainScreen(
     onGoToSettings: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val permissions = when (Build.VERSION.SDK_INT) {
-        Build.VERSION_CODES.TIRAMISU -> {
-            listOf(
-                Manifest.permission.POST_NOTIFICATIONS,
-                Manifest.permission.ACTIVITY_RECOGNITION
-            )
-        }
-
-        Build.VERSION_CODES.Q -> {
-            listOf(
-
-                Manifest.permission.ACTIVITY_RECOGNITION
-            )
-        }
-
-        else -> {
-            emptyList()
-        }
+    val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        listOf(
+            Manifest.permission.POST_NOTIFICATIONS,
+            Manifest.permission.ACTIVITY_RECOGNITION
+        )
+    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        listOf(Manifest.permission.ACTIVITY_RECOGNITION)
+    } else {
+        emptyList()
     }
+
     val permissionsState = rememberMultiplePermissionsState(
         permissions = permissions
     )
@@ -132,8 +125,12 @@ fun MainScreen(
         }
 
     } else if (permissionsState.shouldShowRationale) {
-        Column {
-            Text("Permissions permanently denied.")
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = modifier.fillMaxSize()
+        )  {
+            Text("Permissions are denied. Please enable permission to use Step Counter.")
             Button(
                 onClick = {
                     onGoToSettings()
@@ -146,6 +143,5 @@ fun MainScreen(
         SideEffect {
             permissionsState.run { launchMultiplePermissionRequest() }
         }
-        Text("No Camera Permission")
     }
 }
