@@ -2,7 +2,6 @@ package com.xcvi.stepcounter.ui
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -21,14 +20,16 @@ class StepCounterViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            stepsRepository.getStepsOfDay(LocalDate.now().toEpochDay()).collect{
+            stepsRepository.observeSteps(LocalDate.now().toEpochDay()).collect{
                 steps = it
             }
         }
     }
 
-    fun addSteps(steps: Int = 1) {
-        viewModelScope.launch { stepsRepository.incSteps(steps) }
+    fun addSteps(steps: String){
+        viewModelScope.launch {
+            stepsRepository.updateSteps(steps.toIntOrNull() ?: 0)
+        }
     }
 
 }

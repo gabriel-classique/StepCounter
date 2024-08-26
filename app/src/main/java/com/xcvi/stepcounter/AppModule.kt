@@ -20,7 +20,7 @@ object AppModule {
     @Provides
     @Singleton
     fun provideSensor(application: Application): MeasurableSensor {
-        return StepCounterSensor(application)
+        return StepDetectorSensor(application)
     }
 
     @Provides

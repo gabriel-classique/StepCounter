@@ -10,14 +10,14 @@ import android.hardware.SensorManager
 abstract class MeasurableSensor(
     protected val sensorType: Int
 ) {
-    protected var onSensorValuesChange: ((List<Float>) -> Unit)? = null
+    protected var onSensorValuesChange: ((List<Float>, Long) -> Unit)? = null
 
     abstract val detected: Boolean
 
     abstract fun startListening()
     abstract fun stopListening()
 
-    fun setOnSensorValuesChangeListener(listener: (List<Float>) -> Unit) {
+    fun setOnSensorValuesChangeListener(listener: (List<Float>, Long) -> Unit) {
         onSensorValuesChange = listener
     }
 }
@@ -59,7 +59,7 @@ abstract class AndroidSensor(
             return
         }
         if (event?.sensor?.type == sensorType) {
-            onSensorValuesChange?.invoke(event.values.toList())
+            onSensorValuesChange?.invoke(event.values.toList(), event.timestamp)
         }
     }
 

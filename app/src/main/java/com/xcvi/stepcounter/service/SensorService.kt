@@ -11,7 +11,6 @@ import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.app.NotificationCompat
@@ -19,12 +18,7 @@ import androidx.core.content.ContextCompat
 import com.xcvi.stepcounter.R
 import com.xcvi.stepcounter.data.StepsRepository
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import java.time.LocalDate
 import javax.inject.Inject
-import kotlin.math.roundToInt
 
 
 @AndroidEntryPoint
@@ -35,9 +29,6 @@ class SensorService : Service() {
 
     @Inject
     lateinit var sensor: MeasurableSensor
-
-    private var deltaSteps = 0
-
 
     override fun onCreate() {
         super.onCreate()
@@ -97,23 +88,8 @@ class SensorService : Service() {
             startForeground(SERVICE_ID, notification)
         }
         sensor.startListening()
-        sensor.setOnSensorValuesChangeListener { data ->
-            CoroutineScope(Dispatchers.IO).launch {
-                val savedSteps = repository.getLatestSteps(LocalDate.now().toEpochDay())
-                val newSteps = data[0].roundToInt()
-                val delta = savedSteps - newSteps
-                deltaSteps = if(delta >= 0){
-                    delta
-                } else {
-                    0
-                }
-                val stepsToSave = deltaSteps + newSteps - savedSteps
-                if(stepsToSave > 0){
-                    repository.incSteps(deltaSteps + newSteps - savedSteps)
-                } else {
-                    repository.incSteps()
-                }
-            }
+        sensor.setOnSensorValuesChangeListener { data, timestamp ->
+            repository.incrementSteps()
         }
         isRunning = true
     }

@@ -5,32 +5,37 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.time.LocalDate
 
 class StepsRepository(
     private val stepsDao: StepsDao
 ) {
 
-    suspend fun incSteps(steps: Int = 1){
-        val stepsOfToday = getLatestSteps(LocalDate.now().toEpochDay())
-        stepsDao.updateSteps(
-            StepsEntity(
-                epochDay = LocalDate.now().toEpochDay(),
-                steps = stepsOfToday + steps
-            )
-        )
+
+    fun incrementSteps(steps: Int = 1) {
+        val today = LocalDate.now().toEpochDay()
+        CoroutineScope(Dispatchers.IO).launch {
+            val savedSteps = stepsDao.getLatestSteps(today) ?: 0
+            stepsDao.insertSteps(StepsEntity(today, steps + savedSteps))
+        }
     }
 
-    fun getStepsOfDay(epochDay: Long): Flow<Int> {
-        return stepsDao.getStepsOfDay(epochDay).map {
+    fun updateSteps(steps: Int) {
+        CoroutineScope(Dispatchers.IO).launch {
+            stepsDao.insertSteps(StepsEntity(LocalDate.now().toEpochDay(), steps))
+        }
+    }
+
+    fun observeSteps(epochDay: Long): Flow<Int> {
+        return stepsDao.getSteps(epochDay).map{
             it ?: 0
         }
     }
 
-    suspend fun getLatestSteps(epochDay: Long): Int {
-        val steps = stepsDao.getLatestStepsOfDay(LocalDate.now().toEpochDay()) ?: 0
-        return steps
+    suspend fun getStepsByDate(startDate: LocalDate, endDate: LocalDate): List<StepsEntity> {
+        val start = startDate.toEpochDay()
+        val end = endDate.toEpochDay()
+        return stepsDao.getStepsByDate(start, end)
     }
 
 }

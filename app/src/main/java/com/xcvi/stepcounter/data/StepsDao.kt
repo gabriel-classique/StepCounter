@@ -8,16 +8,16 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface StepsDao {
 
-    @Query("select * from stepsentity")
-    fun getAllSteps(): Flow<List<StepsEntity>>
+    @Query("select steps from stepsentity where epochDay = :epochDay")
+    fun getSteps(epochDay: Long): Flow<Int?>
 
     @Query("select steps from stepsentity where epochDay = :epochDay")
-    fun getStepsOfDay(epochDay: Long): Flow<Int?>
+    suspend fun getLatestSteps(epochDay: Long): Int?
 
-    @Query("select steps from stepsentity where epochDay = :epochDay")
-    suspend fun getLatestStepsOfDay(epochDay: Long): Int?
+    @Query("select * from stepsentity where epochDay >= :start and epochDay <= :end")
+    suspend fun getStepsByDate(start: Long, end: Long): List<StepsEntity>
 
     @Upsert
-    suspend fun updateSteps(stepsEntity: StepsEntity)
+    suspend fun insertSteps(stepsEntity: StepsEntity)
 
 }

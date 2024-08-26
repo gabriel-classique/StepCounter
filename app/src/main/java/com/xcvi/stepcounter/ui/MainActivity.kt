@@ -1,7 +1,6 @@
 package com.xcvi.stepcounter.ui
 
 import android.Manifest
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -10,24 +9,27 @@ import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.startForegroundService
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.xcvi.stepcounter.service.SensorService
@@ -55,7 +57,7 @@ class MainActivity : ComponentActivity() {
                     val steps = viewModel.steps
                     MainScreen(
                         steps = steps,
-                        onStep = { viewModel.addSteps() },
+                        updateSteps = { viewModel.addSteps(it) },
                         onGoToSettings = { openAppSettings() },
                         onPermissionsGranted = { startStepCounterService() }
                     )
@@ -85,7 +87,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainScreen(
     steps: Int,
-    onStep: () -> Unit,
+    updateSteps: (String) -> Unit,
     onPermissionsGranted: () -> Unit,
     onGoToSettings: () -> Unit,
     modifier: Modifier = Modifier
@@ -105,6 +107,13 @@ fun MainScreen(
         permissions = permissions
     )
 
+    var showUpdate by remember {
+        mutableStateOf(false)
+    }
+    var value by remember {
+        mutableStateOf("")
+    }
+
     if (permissionsState.allPermissionsGranted || permissions.isEmpty()) {
         onPermissionsGranted()
         Column(
@@ -117,10 +126,35 @@ fun MainScreen(
                 fontSize = MaterialTheme.typography.headlineMedium.fontSize,
                 fontWeight = MaterialTheme.typography.headlineMedium.fontWeight
             )
-            Button(
-                onClick = { onStep() },
-            ) {
-                Text(text = "Step")
+            Spacer(modifier = modifier.size(8.dp))
+            Button(onClick = { showUpdate = true }) {
+                Text(text = "Update Steps")
+            }
+            if (showUpdate) {
+                AlertDialog(
+                    onDismissRequest = { showUpdate = false },
+                    confirmButton = {
+                        Button(
+                            onClick = {
+                                if (value.isNotBlank()) {
+                                    updateSteps(value)
+                                }
+                                showUpdate = false
+                            }
+                        ) {
+                            Text(text = "Update Steps")
+                        }
+                    },
+                    title = { Text(text = "Update Steps") },
+                    text = {
+                        TextField(value = value, onValueChange = { value = it })
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showUpdate = false }) {
+                            Text(text = "Cancel")
+                        }
+                    }
+                )
             }
         }
 
@@ -129,7 +163,7 @@ fun MainScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = modifier.fillMaxSize()
-        )  {
+        ) {
             Text("Permissions are denied. Please enable permission to use Step Counter.")
             Button(
                 onClick = {

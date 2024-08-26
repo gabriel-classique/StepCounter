@@ -55,14 +55,15 @@ dependencies {
     implementation ("com.google.accompanist:accompanist-permissions:0.34.0")
 
     implementation(libs.hilt.android)
-    ksp(libs.hilt.compiler)
-    implementation(libs.hiltNavigationCompose)
+    ksp(libs.hilt.hiltcompiler)
+    ksp(libs.hilt.androidcompiler)
+    implementation(libs.hilt.navigation)
 
     implementation(libs.room.ktx)
     ksp(libs.room.compiler)
     implementation(libs.room.runtime)
 
-    implementation(libs.navigation)
+    implementation(libs.androidx.navigation)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
