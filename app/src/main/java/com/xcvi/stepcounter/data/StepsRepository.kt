@@ -10,24 +10,41 @@ import java.time.LocalDate
 class StepsRepository(
     private val stepsDao: StepsDao
 ) {
-
-
-    fun incrementSteps(steps: Int = 1) {
+    suspend fun stepsListener(steps: Float) {
         val today = LocalDate.now().toEpochDay()
-        CoroutineScope(Dispatchers.IO).launch {
-            val savedSteps = stepsDao.getLatestSteps(today) ?: 0
-            stepsDao.insertSteps(StepsEntity(today, steps + savedSteps))
+        val counterSteps = steps.toInt()
+        val stepsSinceBoot = stepsDao.getStepsSinceBoot() ?: 0
+        val delta = if (counterSteps - stepsSinceBoot >= 0) {
+            counterSteps - stepsSinceBoot
+        } else {
+            counterSteps
         }
+
+        val savedSteps = stepsDao.getLatestSteps(today) ?: 0
+        stepsDao.updateSteps(
+            StepsEntity(
+                today,
+                savedSteps + delta
+            )
+        )
+        stepsDao.updateStepsSinceBoot(
+            StepsSinceBootEntity(
+                id = 1,
+                stepsSinceBoot = counterSteps
+            )
+        )
     }
 
-    fun updateSteps(steps: Int) {
-        CoroutineScope(Dispatchers.IO).launch {
-            stepsDao.insertSteps(StepsEntity(LocalDate.now().toEpochDay(), steps))
-        }
+    suspend fun resetCount() {
+        stepsDao.updateStepsSinceBoot(StepsSinceBootEntity(id = 1, 0))
+    }
+
+    suspend fun updateSteps(steps: Int) {
+        stepsDao.updateSteps(StepsEntity(LocalDate.now().toEpochDay(), steps))
     }
 
     fun observeSteps(epochDay: Long): Flow<Int> {
-        return stepsDao.getSteps(epochDay).map{
+        return stepsDao.getSteps(epochDay).map {
             it ?: 0
         }
     }

@@ -18,6 +18,12 @@ interface StepsDao {
     suspend fun getStepsByDate(start: Long, end: Long): List<StepsEntity>
 
     @Upsert
-    suspend fun insertSteps(stepsEntity: StepsEntity)
+    suspend fun updateSteps(stepsEntity: StepsEntity)
+
+    @Upsert
+    suspend fun updateStepsSinceBoot(stepsSinceBootEntity: StepsSinceBootEntity)
+
+    @Query("select stepsSinceBoot from stepssincebootentity where id = 1")
+    suspend fun getStepsSinceBoot(): Int?
 
 }
