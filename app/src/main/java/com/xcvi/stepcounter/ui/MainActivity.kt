@@ -57,7 +57,7 @@ class MainActivity : ComponentActivity() {
                     val steps = viewModel.steps
                     MainScreen(
                         steps = steps,
-                        updateSteps = { viewModel.addSteps(it) },
+                        updateSteps = { viewModel.editSteps(it) },
                         onGoToSettings = { openAppSettings() },
                         onPermissionsGranted = { startStepCounterService() }
                     )

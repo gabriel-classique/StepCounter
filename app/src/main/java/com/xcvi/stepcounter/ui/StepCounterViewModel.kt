@@ -26,7 +26,7 @@ class StepCounterViewModel @Inject constructor(
         }
     }
 
-    fun addSteps(steps: String){
+    fun editSteps(steps: String){
         viewModelScope.launch {
             stepsRepository.updateSteps(steps.toIntOrNull() ?: 0)
         }

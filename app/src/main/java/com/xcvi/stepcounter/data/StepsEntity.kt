@@ -7,5 +7,4 @@ import androidx.room.PrimaryKey
 data class StepsEntity(
     @PrimaryKey val epochDay: Long,
     val steps: Int
-) {
-}
+)

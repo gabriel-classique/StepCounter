@@ -9,7 +9,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
 import android.os.Build
-import android.os.IBinder
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -55,13 +54,12 @@ class SensorService : LifecycleService() {
             }
             Actions.RESTART.name -> {
                 lifecycleScope.launch {
-                    repository.resetCount()
+                    repository.resetCounter()
                 }
                 if (hasPermissions(this)) {
                     start()
                 }
             }
-
             Actions.STOP.name -> stop()
         }
         return super.onStartCommand(intent, flags, startId)

@@ -2,8 +2,10 @@ package com.xcvi.stepcounter.data
 
 import androidx.room.Dao
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
+import java.time.LocalDate
 
 @Dao
 interface StepsDao {
@@ -19,6 +21,29 @@ interface StepsDao {
 
     @Upsert
     suspend fun updateSteps(stepsEntity: StepsEntity)
+
+    @Transaction
+    suspend fun incrementSteps(counterSteps: Int){
+        val stepsSinceBoot = getStepsSinceBoot() ?: 0
+        val delta = if (counterSteps - stepsSinceBoot >= 0) {
+            counterSteps - stepsSinceBoot
+        } else {
+            counterSteps
+        }
+        val savedSteps = getLatestSteps(LocalDate.now().toEpochDay()) ?: 0
+        updateSteps(
+            StepsEntity(
+                LocalDate.now().toEpochDay(),
+                savedSteps + delta
+            )
+        )
+        updateStepsSinceBoot(
+            StepsSinceBootEntity(
+                id = 1,
+                stepsSinceBoot = counterSteps
+            )
+        )
+    }
 
     @Upsert
     suspend fun updateStepsSinceBoot(stepsSinceBootEntity: StepsSinceBootEntity)
