@@ -16,7 +16,7 @@ class RebootBroadcastReceiver: BroadcastReceiver() {
 
     private fun restartService(context: Context?){
         Intent(context, SensorService::class.java).also {
-            it.action = SensorService.Actions.RESTART.name
+            it.action = SensorService.Actions.START.name
             context?.startForegroundService(it)
         }
     }

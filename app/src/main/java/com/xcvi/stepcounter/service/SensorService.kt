@@ -55,15 +55,6 @@ class SensorService : LifecycleService() {
                 }
             }
 
-            Actions.RESTART.name -> {
-                lifecycleScope.launch {
-                    repository.resetCounter()
-                }
-                if (hasPermissions(this)) {
-                    start()
-                }
-            }
-
             Actions.STOP.name -> stop()
         }
         return super.onStartCommand(intent, flags, startId)
@@ -100,7 +91,7 @@ class SensorService : LifecycleService() {
         isRunning = false
     }
 
-    enum class Actions { START, STOP, RESTART }
+    enum class Actions { START, STOP }
 
     companion object {
         const val NOTIFICATION_CHANNEL_ID = "sensor_service_channel_id"
