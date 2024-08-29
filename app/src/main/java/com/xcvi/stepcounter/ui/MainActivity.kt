@@ -122,7 +122,7 @@ fun MainScreen(
             modifier = modifier.fillMaxSize()
         ) {
             Text(
-                text = "Steps: $steps",
+                text = "Accelerometer Steps: $steps",
                 fontSize = MaterialTheme.typography.headlineMedium.fontSize,
                 fontWeight = MaterialTheme.typography.headlineMedium.fontWeight
             )

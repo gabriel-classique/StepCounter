@@ -7,8 +7,8 @@ import java.time.LocalDate
 class StepsRepository(
     private val stepsDao: StepsDao
 ) {
-    suspend fun stepsListener(steps: Float) {
-        stepsDao.incrementSteps(steps.toInt())
+    suspend fun stepsListener(steps: Int) {
+        stepsDao.incrementSteps(steps)
     }
 
     suspend fun resetCounter() {

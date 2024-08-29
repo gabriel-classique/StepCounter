@@ -25,6 +25,17 @@ interface StepsDao {
     @Transaction
     suspend fun incrementSteps(counterSteps: Int){
         val savedSteps = getLatestSteps(LocalDate.now().toEpochDay()) ?: 0
+        updateSteps(
+            StepsEntity(
+                LocalDate.now().toEpochDay(),
+                savedSteps + counterSteps
+            )
+        )
+    }
+    /*
+    @Transaction
+    suspend fun incrementSteps(counterSteps: Int){
+        val savedSteps = getLatestSteps(LocalDate.now().toEpochDay()) ?: 0
         val stepsSinceBoot = getStepsSinceBoot() ?: 0
         val delta = if (counterSteps - stepsSinceBoot >= 0) {
             counterSteps - stepsSinceBoot
@@ -44,6 +55,8 @@ interface StepsDao {
             )
         )
     }
+
+     */
 
     @Upsert
     suspend fun updateStepsSinceBoot(stepsSinceBootEntity: StepsSinceBootEntity)

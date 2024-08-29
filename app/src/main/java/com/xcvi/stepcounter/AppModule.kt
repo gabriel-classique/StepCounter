@@ -2,11 +2,11 @@ package com.xcvi.stepcounter
 
 import android.app.Application
 import androidx.room.Room
-import com.xcvi.stepcounter.service.MeasurableSensor
-import com.xcvi.stepcounter.service.*
 import com.xcvi.stepcounter.data.BioDatabase
 import com.xcvi.stepcounter.data.StepsDao
 import com.xcvi.stepcounter.data.StepsRepository
+import com.xcvi.stepcounter.service.sensor.AccelerometerSensor
+import com.xcvi.stepcounter.service.sensor.StepListener
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -19,8 +19,8 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideSensor(application: Application): MeasurableSensor {
-        return StepCounterSensor(application)
+    fun provideSensor(application: Application): AccelerometerSensor {
+        return AccelerometerSensor(application)
     }
 
     @Provides

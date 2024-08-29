@@ -18,6 +18,8 @@ import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import com.xcvi.stepcounter.R
 import com.xcvi.stepcounter.data.StepsRepository
+import com.xcvi.stepcounter.service.sensor.AccelerometerSensor
+import com.xcvi.stepcounter.service.sensor.StepListener
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -30,7 +32,7 @@ class SensorService : LifecycleService() {
     lateinit var repository: StepsRepository
 
     @Inject
-    lateinit var sensor: MeasurableSensor
+    lateinit var sensor: AccelerometerSensor
 
     override fun onCreate() {
         super.onCreate()
@@ -79,18 +81,19 @@ class SensorService : LifecycleService() {
             startForeground(SERVICE_ID, notification)
         }
 
-        sensor.startListening()
-
-        sensor.setOnSensorValuesChangeListener { data, _ ->
-            lifecycleScope.launch {
-                repository.stepsListener(data[0])
+        sensor.registerListener(object : StepListener {
+            override fun onStep(count: Int) {
+                lifecycleScope.launch {
+                    repository.stepsListener(count)
+                }
             }
-        }
+        })
+
         isRunning = true
     }
 
     private fun stop() {
-        sensor.stopListening()
+        sensor.unregisterListener()
         stopSelf()
         isRunning = false
     }
