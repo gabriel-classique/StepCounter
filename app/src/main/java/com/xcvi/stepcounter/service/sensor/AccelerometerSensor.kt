@@ -17,7 +17,7 @@ class AccelerometerSensor(
     companion object {
         private const val ACCEL_RING_SIZE = 500
         private const val VEL_RING_SIZE = 100
-        private const val STEP_THRESHOLD = 100f
+        private const val STEP_THRESHOLD = 75f
         private const val STEP_DELAY_NS = 250000000
     }
 
