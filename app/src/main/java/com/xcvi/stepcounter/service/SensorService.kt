@@ -54,6 +54,7 @@ class SensorService : LifecycleService() {
                     start()
                 }
             }
+
             Actions.RESTART.name -> {
                 lifecycleScope.launch {
                     repository.resetCounter()
@@ -62,6 +63,7 @@ class SensorService : LifecycleService() {
                     start()
                 }
             }
+
             Actions.STOP.name -> stop()
         }
         return super.onStartCommand(intent, flags, startId)
@@ -69,7 +71,7 @@ class SensorService : LifecycleService() {
 
     private fun start() {
 
-        val notification =  if (isRunning) {
+        val notification = if (isRunning) {
             notyBuilder(title = "Step Counter is Active")
         } else {
             notyBuilder(title = "Step Counter is NOT detected.")
@@ -98,7 +100,7 @@ class SensorService : LifecycleService() {
         isRunning = false
     }
 
-    enum class Actions { START, STOP, RESTART}
+    enum class Actions { START, STOP, RESTART }
 
     companion object {
         const val NOTIFICATION_CHANNEL_ID = "sensor_service_channel_id"

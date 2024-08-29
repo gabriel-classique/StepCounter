@@ -11,10 +11,6 @@ class StepsRepository(
         stepsDao.incrementSteps(steps)
     }
 
-    suspend fun resetCounter() {
-        stepsDao.updateStepsSinceBoot(StepsSinceBootEntity(id = 1, 0))
-    }
-
     suspend fun updateSteps(steps: Int) {
         stepsDao.updateSteps(StepsEntity(LocalDate.now().toEpochDay(), steps))
     }

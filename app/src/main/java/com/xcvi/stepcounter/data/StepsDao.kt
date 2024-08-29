@@ -32,36 +32,5 @@ interface StepsDao {
             )
         )
     }
-    /*
-    @Transaction
-    suspend fun incrementSteps(counterSteps: Int){
-        val savedSteps = getLatestSteps(LocalDate.now().toEpochDay()) ?: 0
-        val stepsSinceBoot = getStepsSinceBoot() ?: 0
-        val delta = if (counterSteps - stepsSinceBoot >= 0) {
-            counterSteps - stepsSinceBoot
-        } else {
-            counterSteps
-        }
-        updateSteps(
-            StepsEntity(
-                LocalDate.now().toEpochDay(),
-                savedSteps + delta
-            )
-        )
-        updateStepsSinceBoot(
-            StepsSinceBootEntity(
-                id = 1,
-                stepsSinceBoot = counterSteps
-            )
-        )
-    }
-
-     */
-
-    @Upsert
-    suspend fun updateStepsSinceBoot(stepsSinceBootEntity: StepsSinceBootEntity)
-
-    @Query("select stepsSinceBoot from stepssincebootentity where id = 1")
-    suspend fun getStepsSinceBoot(): Int?
 
 }
